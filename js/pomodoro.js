@@ -1,39 +1,6 @@
-var POMODORO_LENGTH = 25*60*1000; // In millis
-var QUICK_BREAK_LENGTH = 5*60*1000; // In millis
-var LONG_BREAK_LENGTH = 30*60*1000; // In millis
-
-function $(id) {
-    return document.getElementById(id);
-}
-
-function pad(num, size) {
-	var s = "0000" + num;
-	return s.substr(s.length - size);
-}
-
-function formatTime(time) {
-	var h = m = s = ms = 0;
-	var newTime = '';
-
-	// Check if the time is negative
-	var isNegative = time < 0;
-
-	// Always format numbers as if they were positive and then
-	// we can add the sign at the end
-	time = Math.abs(time);
-
-	h = Math.round( time / (60 * 60 * 1000) );
-	time = time % (60 * 60 * 1000);
-	m = Math.round( time / (60 * 1000) );
-	time = time % (60 * 1000);
-	s = Math.round( time / 1000 );
-
-	newTime = pad(h, 2) + ':' + pad(m, 2) + ':' + pad(s, 2);
-
-	newTime = isNegative ? "-" + newTime : newTime;
-
-	return newTime;
-}
+/*****************************************
+**************** TIMER *******************
+*****************************************/
 
 var clsTimer = function() {
 	var MULTIPLIER = 60; // Used to speed up the time for testing
@@ -83,6 +50,62 @@ var clsTimer = function() {
 	this.isLapsed = function() {
 		return this.time() < 0;
 	}
+}
+
+/*****************************************
+*************** POMODORO *****************
+*****************************************/
+
+var clsPomodoroStateMachine = function() {
+	var POMODORO_LENGTH = 25*60*1000; // In millis
+	var QUICK_BREAK_LENGTH = 5*60*1000; // In millis
+	var LONG_BREAK_LENGTH = 30*60*1000; // In millis
+
+	var pomodoroCount = 0;
+
+	// Used to get nextState
+	this.nextState = function() {
+
+	}
+
+
+}
+
+/*****************************************
+**************** DISPLAY *****************
+*****************************************/
+
+function $(id) {
+    return document.getElementById(id);
+}
+
+function pad(num, size) {
+	var s = "0000" + num;
+	return s.substr(s.length - size);
+}
+
+function formatTime(time) {
+	var h = m = s = ms = 0;
+	var newTime = '';
+
+	// Check if the time is negative
+	var isNegative = time < 0;
+
+	// Always format numbers as if they were positive and then
+	// we can add the sign at the end
+	time = Math.abs(time);
+
+	h = Math.round( time / (60 * 60 * 1000) );
+	time = time % (60 * 60 * 1000);
+	m = Math.round( time / (60 * 1000) );
+	time = time % (60 * 1000);
+	s = Math.round( time / 1000 );
+
+	newTime = pad(h, 2) + ':' + pad(m, 2) + ':' + pad(s, 2);
+
+	newTime = isNegative ? "-" + newTime : newTime;
+
+	return newTime;
 }
 
 checkTime = function () {
