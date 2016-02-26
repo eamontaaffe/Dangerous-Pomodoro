@@ -3,7 +3,7 @@
 *****************************************/
 
 var clsTimer = function() {
-	var MULTIPLIER = 120; // Used to speed up the time for testing
+	var MULTIPLIER = 1; // Used to speed up the time for testing
 
 	var duration = 0;
 	var startAt = 0;	// Time of last start / resume. (0 if not running)
@@ -77,7 +77,7 @@ var clsPomodoroStateMachine = function() {
 	function getStateText() {
 		switch (stateType) {
 			case STATE_POMODORO:
-				return "Pomodoro";
+				return "Work now";
 			case STATE_BREAK:
 				var isLongBreak = pomodoroCount > 0 && pomodoroCount % 4 == 0;
 				return !isLongBreak ? "Quick break" : "Long break";
@@ -86,6 +86,7 @@ var clsPomodoroStateMachine = function() {
 		}
 	}
 
+	// Have we passed the allocated time?
 	function isLapsed() {
 		return timer.getTime() < 0;
 	}
@@ -187,11 +188,11 @@ function formatTime(time) {
 	// we can add the sign at the end
 	time = Math.abs(time);
 
-	h = Math.round( time / (60 * 60 * 1000) );
+	h = Math.floor( time / (60 * 60 * 1000) );
 	time = time % (60 * 60 * 1000);
-	m = Math.round( time / (60 * 1000) );
+	m = Math.floor( time / (60 * 1000) );
 	time = time % (60 * 1000);
-	s = Math.round( time / 1000 );
+	s = Math.floor( time / 1000 );
 
 	newTime = pad(h, 2) + ':' + pad(m, 2) + ':' + pad(s, 2);
 
@@ -213,6 +214,8 @@ function replaceClickListener(btn,fcn) {
 **************** GLOBAL ******************
 *****************************************/
 
+var lastState = null;
+
 displayState = function() {
 	var state = pomodoroStateMachine.getState();
 	console.log(state);
@@ -221,17 +224,24 @@ displayState = function() {
 
 	$('text-state').innerHTML = state.stateText;
 
-	$('text-status').innerHTML = "Pomodoro count: " + state.pomodoroCnt;
+	$('text-status').innerHTML = "Count: " + state.pomodoroCnt;
 
 	$('btn-input').innerHTML = state.inputText;
 
-	var btn = $('btn-input');
-	var btnClone = btn.cloneNode(true);
-	btn.parentNode.replaceChild(btnClone,btn);
-	btn = btnClone;
+	// Only change the input button if something other than
+	// time has changed
+	state.timeElapsed = "";
+	if (!(JSON.stringify(state) === JSON.stringify(lastState))) {
+		var btn = $('btn-input');
+		var btnClone = btn.cloneNode(true);
+		btn.parentNode.replaceChild(btnClone,btn);
+		btn = btnClone;
 
-	btn.addEventListener('click',state.requiredInput)
-	btn.addEventListener('click',displayState);
+		btn.addEventListener('click',state.requiredInput)
+		btn.addEventListener('click',displayState);
+	}
+	
+	lastState = state;
 }
 
 var pomodoroStateMachine = new clsPomodoroStateMachine();
@@ -241,9 +251,4 @@ $('btn-input').addEventListener('click',pomodoroStateMachine.getInput);
 displayState();
 
 // Used to check the time every second 
-var myVar = setInterval(displayState,500);
-
-
-
-
-
+var myVar = setInterval(displayState,100);
