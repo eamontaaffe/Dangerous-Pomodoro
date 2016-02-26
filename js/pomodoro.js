@@ -36,7 +36,7 @@ var clsTimer = function() {
 	};
 
 	// GetTime
-	this.time = function() {
+	this.getTime = function() {
 		var time = lapTime + (startAt ? now() - startAt : 0);
 		return duration - time; 
 	};
@@ -48,7 +48,7 @@ var clsTimer = function() {
 
 	// Has the duration elapsed?
 	this.isLapsed = function() {
-		return this.time() < 0;
+		return this.getTime() < 0;
 	}
 }
 
@@ -61,14 +61,116 @@ var clsPomodoroStateMachine = function() {
 	var QUICK_BREAK_LENGTH = 5*60*1000; // In millis
 	var LONG_BREAK_LENGTH = 30*60*1000; // In millis
 
+	/**** STATE TYPES ****/
+	// The initial state before the session has begun
+	var STATE_INIT = 0; 
+	// Currently in a pomodoro
+	var STATE_POMODORO = 1;
+	// Currently in a short break
+	var STATE_QUICK_BREAK = 2;
+	// Currently in a long break
+	var STATE_LONG_BREAK = 3;
+
+	var stateType = STATE_INIT;
 	var pomodoroCount = 0;
 
-	// Used to get nextState
-	this.nextState = function() {
+	var timer = new clsTimer();
 
+	function getStateText() {
+		switch (stateType) {
+			case STATE_POMODORO:
+				return "Pomodoro";
+			case STATE_QUICK_BREAK:
+				return "Quick break";
+			case STATE_LONG_BREAK:
+				return "STATE_LONG_BREAK";
+			default:
+				return "Start";
+		}
 	}
 
+	function isLapsed() {
+		return timer.getTime() < 0;
+	}
 
+	function getInputText() {
+		switch (stateType) {
+			case STATE_POMODORO:
+				return !isLapsed() ? "Stop" : "Start Break";
+			case STATE_QUICK_BREAK:
+				return !isLapsed() ? "Skip" : "Start Working";
+			case STATE_LONG_BREAK:
+				return !isLapsed() ? "Skip" : "Start Working";
+			default:
+				return "Start";
+		}
+	}
+
+	startPomodoro = function() {
+		console.log("startPomodoro");
+		stateType = STATE_POMODORO;
+		timer.reset();
+		timer.setDuration(POMODORO_LENGTH);
+		timer.start();
+	}
+
+	stopPomodoro = function() {
+		console.log("stopPomodoro");
+		stateType = STATE_INIT;
+		timer.stop();
+		timer.reset();
+		timer.setDuration(POMODORO_LENGTH);
+	}
+
+	startQuickBreak = function() {
+		console.log("startQuickBreak");
+		stateType = STATE_QUICK_BREAK;
+		timer.reset();
+		timer.setDuration(QUICK_BREAK_LENGTH);
+		timer.start();
+	}
+
+	startLongBreak = function() {
+		console.log("startLongBreak");
+		stateType = STATE_LONG_BREAK;
+		timer.reset();
+		timer.setDuration(QUICK_LONG_LENGTH);
+		timer.start();
+	}
+
+	skipBreak = function() {
+		console.log("skipBreak");
+		stateType = STATE_POMODORO;
+		return startPomodoro();
+	}
+
+	function getRequiredInput() {
+		switch (stateType) {
+			case STATE_POMODORO:
+				return !isLapsed() ? stopPomodoro : startQuickBreak;
+			case STATE_QUICK_BREAK:
+				return skipBreak
+			case STATE_LONG_BREAK:
+				return skipBreak;
+			default:
+				return startPomodoro;
+		}
+	}
+
+	// This returns the current state of the PSM
+	this.getState = function() {
+		return new state(stateType, timer.getTime(), pomodoroCount,
+			getStateText(),getRequiredInput(),getInputText());
+	}
+
+	state = function(stateType, timeElapsed, pomodoroCnt,stateText, requiredInput,inputText) {
+		this.stateType = stateType;
+		this.timeElapsed = timeElapsed;
+		this.pomodoroCnt = pomodoroCnt;
+		this.stateText = stateText;
+		this.requiredInput = requiredInput;
+		this.inputText = inputText;
+	}
 }
 
 /*****************************************
@@ -108,85 +210,47 @@ function formatTime(time) {
 	return newTime;
 }
 
-checkTime = function () {
-	displayTime();
-	displayStatus();
-}
-
-startTime = function () {
-
-	timer.start();
-
-	//Update the time display immediately
-	checkTime();
-}
-
-stopTime = function () {
-	timer.stop();
-
-	timer.reset();
-	timer.setDuration(POMODORO_LENGTH);
-
-	//Update the time display immediately
-	checkTime();
-}
-
-startBreak = function() {
-	timer.stop();
-
-	timer.reset();
-	timer.setDuration(QUICK_BREAK_LENGTH);
-
-	timer.start();
-
-	//Update the time display immediately
-	checkTime();
-}
-
-displayTime = function() {
-	$('text-time').innerHTML = formatTime(timer.time());
-}
-
-displayStatus = function () {
-	var status = "";
-	var btnText = "";
-	var btn = $('btn-start-stop');
-
+function replaceClickListener(btn,fcn) {
 	var btnClone = btn.cloneNode(true);
 	btn.parentNode.replaceChild(btnClone,btn);
 
 	btn = btnClone;
 
-	if (timer.isLapsed()) {
-		console.log("lapsed");
-		status = "Take a break";
-		btnText = "Start break";
-		btn.addEventListener('click',startBreak);
-	} else if (timer.isRunning()) {
-		console.log("running");
-		status = "Work now";
-		btnText = "Stop";
-		btn.addEventListener('click',stopTime);
-	} else {
-		console.log("waiting")
-		status = "Ready to go?";
-		btnText = "Start";
-		btn.addEventListener('click',startTime);
-	}
-
-	$('text-status').innerHTML = status;
-	$('btn-start-stop').innerHTML = btnText;
+	btn.addEventListener('click',fcn);
 }
 
+displayState = function() {
+	var state = pomodoroStateMachine.getState();
+	console.log(state);
 
-var timer = new clsTimer();
+	$('text-time').innerHTML = formatTime(state.timeElapsed);
 
-// Get ready for first pomodoro by prepping the timer
-timer.setDuration(25*60*1000);
+	$('text-state').innerHTML = state.stateText;
+
+	$('btn-input').innerHTML = state.inputText;
+
+	var btn = $('btn-input');
+	var btnClone = btn.cloneNode(true);
+	btn.parentNode.replaceChild(btnClone,btn);
+	btn = btnClone;
+
+	btn.addEventListener('click',state.requiredInput)
+}
+
+/*****************************************
+**************** GLOBAL ******************
+*****************************************/
+
+var pomodoroStateMachine = new clsPomodoroStateMachine();
+
+$('btn-input').addEventListener('click',pomodoroStateMachine.getInput);
+
+displayState();
 
 // Used to check the time every second 
-var myVar = setInterval(checkTime,1000);
+var myVar = setInterval(displayState,500);
 
-// Start up by displaying the time immediately
-checkTime();
+
+
+
 
