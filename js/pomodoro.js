@@ -3,7 +3,7 @@
 *****************************************/
 
 var clsTimer = function() {
-	var MULTIPLIER = 60; // Used to speed up the time for testing
+	var MULTIPLIER = 120; // Used to speed up the time for testing
 
 	var duration = 0;
 	var startAt = 0;	// Time of last start / resume. (0 if not running)
@@ -66,10 +66,8 @@ var clsPomodoroStateMachine = function() {
 	var STATE_INIT = 0; 
 	// Currently in a pomodoro
 	var STATE_POMODORO = 1;
-	// Currently in a short break
-	var STATE_QUICK_BREAK = 2;
-	// Currently in a long break
-	var STATE_LONG_BREAK = 3;
+	// Currently in a break
+	var STATE_BREAK = 2;
 
 	var stateType = STATE_INIT;
 	var pomodoroCount = 0;
@@ -80,12 +78,11 @@ var clsPomodoroStateMachine = function() {
 		switch (stateType) {
 			case STATE_POMODORO:
 				return "Pomodoro";
-			case STATE_QUICK_BREAK:
-				return "Quick break";
-			case STATE_LONG_BREAK:
-				return "STATE_LONG_BREAK";
+			case STATE_BREAK:
+				var isLongBreak = pomodoroCount > 0 && pomodoroCount % 4 == 0;
+				return !isLongBreak ? "Quick break" : "Long break";
 			default:
-				return "Start";
+				return "Click Start";
 		}
 	}
 
@@ -96,10 +93,8 @@ var clsPomodoroStateMachine = function() {
 	function getInputText() {
 		switch (stateType) {
 			case STATE_POMODORO:
-				return !isLapsed() ? "Stop" : "Start Break";
-			case STATE_QUICK_BREAK:
-				return !isLapsed() ? "Skip" : "Start Working";
-			case STATE_LONG_BREAK:
+				return !isLapsed() ? "Stop" : "Finish Pomodoro";
+			case STATE_BREAK:
 				return !isLapsed() ? "Skip" : "Start Working";
 			default:
 				return "Start";
@@ -122,19 +117,16 @@ var clsPomodoroStateMachine = function() {
 		timer.setDuration(POMODORO_LENGTH);
 	}
 
-	startQuickBreak = function() {
-		console.log("startQuickBreak");
-		stateType = STATE_QUICK_BREAK;
-		timer.reset();
-		timer.setDuration(QUICK_BREAK_LENGTH);
-		timer.start();
-	}
+	startBreak = function() {
+		console.log("startBreak");
+		stateType = STATE_BREAK;
+		// If you are starting a break it means you have just finished a pomodoro
+		pomodoroCount ++;
 
-	startLongBreak = function() {
-		console.log("startLongBreak");
-		stateType = STATE_LONG_BREAK;
+		// Is it a long break?
+		var isLongBreak = ( pomodoroCount > 0 ) && ( pomodoroCount % 4 == 0 );
 		timer.reset();
-		timer.setDuration(QUICK_LONG_LENGTH);
+		timer.setDuration(isLongBreak ? LONG_BREAK_LENGTH : QUICK_BREAK_LENGTH );
 		timer.start();
 	}
 
@@ -147,10 +139,8 @@ var clsPomodoroStateMachine = function() {
 	function getRequiredInput() {
 		switch (stateType) {
 			case STATE_POMODORO:
-				return !isLapsed() ? stopPomodoro : startQuickBreak;
-			case STATE_QUICK_BREAK:
-				return skipBreak
-			case STATE_LONG_BREAK:
+				return !isLapsed() ? stopPomodoro : startBreak;
+			case STATE_BREAK:
 				return skipBreak;
 			default:
 				return startPomodoro;
@@ -219,6 +209,10 @@ function replaceClickListener(btn,fcn) {
 	btn.addEventListener('click',fcn);
 }
 
+/*****************************************
+**************** GLOBAL ******************
+*****************************************/
+
 displayState = function() {
 	var state = pomodoroStateMachine.getState();
 	console.log(state);
@@ -226,6 +220,8 @@ displayState = function() {
 	$('text-time').innerHTML = formatTime(state.timeElapsed);
 
 	$('text-state').innerHTML = state.stateText;
+
+	$('text-status').innerHTML = "Pomodoro count: " + state.pomodoroCnt;
 
 	$('btn-input').innerHTML = state.inputText;
 
@@ -235,11 +231,8 @@ displayState = function() {
 	btn = btnClone;
 
 	btn.addEventListener('click',state.requiredInput)
+	btn.addEventListener('click',displayState);
 }
-
-/*****************************************
-**************** GLOBAL ******************
-*****************************************/
 
 var pomodoroStateMachine = new clsPomodoroStateMachine();
 
