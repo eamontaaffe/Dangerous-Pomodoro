@@ -80,7 +80,7 @@ function formatTime(time) {
 
 var editor = $('editor');
 
-var COUNTDOWN_DURATION = 15*1000;
+var COUNTDOWN_DURATION = 30*1000;
 var countdown_callback = function() {
 	countdown_timer.reset();
 	pomodoro_timer.reset();
@@ -89,11 +89,14 @@ var countdown_callback = function() {
 };
 var countdown_timer = new clsTimer(countdown_callback, COUNTDOWN_DURATION);
 
-var POMODORO_DURATION = 1*1000; //25*60*1000;
+var POMODORO_DURATION = 25*60*1000;
 var pomodoro_callback = function() {
 	countdown_timer.reset();
 	pomodoro_timer.reset();
-	alert("You made it!!, I am going to stop the forcing you to write now!");
+	count ++;
+	update_count();
+	save_button.disabled = false;
+	alert("You made it!!, I am going to stop the forcing you to write now!\nMake sure you save youre work!");
 };
 var pomodoro_timer = new clsTimer(pomodoro_callback, POMODORO_DURATION);
 
@@ -109,6 +112,7 @@ displayState = function() {
 var myVar = setInterval(displayState,100);
 
 var keypress = function(){
+	save_button.disabled = true;
 	countdown_timer.reset();
 	countdown_timer.start();
 
@@ -130,4 +134,14 @@ save_work = function() {
     a.click();
 }
 
+var count_text_area = $('text-count');
+var count = 0;
+
+update_count = function() {
+	count_text_area.innerHTML = "Count: " + count;
+}
+
+update_count();
+
 save_button.addEventListener('click',save_work);
+
