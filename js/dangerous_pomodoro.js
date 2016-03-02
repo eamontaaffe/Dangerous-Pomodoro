@@ -176,9 +176,6 @@ var closeModal = function() {
 	modal.style.display = "none";
 }
 
-// When the user clicks on the button, open the modal 
-btn.onclick = openModal;
-
 // When the user clicks on <span> (x), close the modal
 span.onclick = closeModal;
 
