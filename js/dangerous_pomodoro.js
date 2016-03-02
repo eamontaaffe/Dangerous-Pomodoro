@@ -110,7 +110,7 @@ var pomodoro_callback = function() {
 	changeBackgroundColor(BACKGROUND_GREEN);
 
 	var breaktext = count%4 ? "Take a 5 minute break." : "Treat yourself to a full 30 minutes off!";
-	alert("You made it!!, I am going to stop the forcing you to write now!\n\n" + breaktext + "\n\nMake sure you save youre work!");
+	alert("You made it!!, I am going to stop the forcing you to write now!\n\n" + breaktext + "\n\nMake sure you save your work!");
 };
 var pomodoro_timer = new clsTimer(pomodoro_callback, POMODORO_DURATION);
 
