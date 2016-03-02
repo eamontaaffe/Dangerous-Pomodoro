@@ -17,6 +17,12 @@ var clsTimer = function() {
 		duration = dur/MULTIPLIER;
 	}
 
+	this.callback = null;
+
+	this.setCallback = function(callback) {
+		this.callback = callback;
+	}
+
 	// Public methods
 	// Start or resume
 	this.start = function() {
@@ -82,7 +88,7 @@ var clsPomodoroStateMachine = function() {
 				var isLongBreak = pomodoroCount > 0 && pomodoroCount % 4 == 0;
 				return !isLongBreak ? "Quick break" : "Long break";
 			default:
-				return "Click Start";
+				return "Start typing to begin";
 		}
 	}
 
@@ -108,6 +114,10 @@ var clsPomodoroStateMachine = function() {
 		timer.reset();
 		timer.setDuration(POMODORO_LENGTH);
 		timer.start();
+	}
+
+	this.start = function() {
+		startPomodoro();
 	}
 
 	stopPomodoro = function() {
@@ -244,11 +254,18 @@ displayState = function() {
 	lastState = state;
 }
 
+keypress = function() {
+	pomodoroStateMachine.start();
+}
+
 var pomodoroStateMachine = new clsPomodoroStateMachine();
 
 $('btn-input').addEventListener('click',pomodoroStateMachine.getInput);
+
+$('editor').addEventListener('keypress',keypress)
 
 displayState();
 
 // Used to check the time every second 
 var myVar = setInterval(displayState,100);
+
