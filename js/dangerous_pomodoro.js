@@ -79,7 +79,7 @@ function formatTime(time) {
 }
 
 var BACKGROUND_RED = "#FFEBEE";
-var BACKGROUND_GREEN = "#E8F5E9";
+var BACKGROUND_GREEN = "#F1F8E9";
 
 function changeBackgroundColor(color) {
    document.body.style.background = color;
