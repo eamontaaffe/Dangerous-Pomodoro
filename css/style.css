@@ -17,3 +17,7 @@
 	height: 100%;
     width: 100%;
 }
+
+textarea {
+	background-color: transparent;
+}

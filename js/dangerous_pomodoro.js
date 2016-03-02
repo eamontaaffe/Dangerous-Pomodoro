@@ -78,6 +78,15 @@ function formatTime(time) {
 	return newTime;
 }
 
+var BACKGROUND_RED = "#FFEBEE";
+var BACKGROUND_GREEN = "#E8F5E9";
+
+function changeBackgroundColor(color) {
+   document.body.style.background = color;
+}
+
+changeBackgroundColor(BACKGROUND_GREEN);
+
 var editor = $('editor');
 
 var COUNTDOWN_DURATION = 30*1000;
@@ -96,6 +105,7 @@ var pomodoro_callback = function() {
 	count ++;
 	update_count();
 	save_button.disabled = false;
+	changeBackgroundColor(BACKGROUND_GREEN);
 	alert("You made it!!, I am going to stop the forcing you to write now!\nMake sure you save youre work!");
 };
 var pomodoro_timer = new clsTimer(pomodoro_callback, POMODORO_DURATION);
@@ -115,8 +125,8 @@ var keypress = function(){
 	save_button.disabled = true;
 	countdown_timer.reset();
 	countdown_timer.start();
-
 	pomodoro_timer.start();
+	changeBackgroundColor(BACKGROUND_RED);
 }
 
 editor.addEventListener('keypress',keypress);
@@ -138,7 +148,7 @@ var count_text_area = $('text-count');
 var count = 0;
 
 update_count = function() {
-	count_text_area.innerHTML = "Count: " + count;
+	count_text_area.innerHTML = "Pomodoro count: " + count;
 }
 
 update_count();
