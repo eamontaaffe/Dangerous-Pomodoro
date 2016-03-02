@@ -98,7 +98,7 @@ var countdown_callback = function() {
 };
 var countdown_timer = new clsTimer(countdown_callback, COUNTDOWN_DURATION);
 
-var POMODORO_DURATION = 25*60*1000;
+var POMODORO_DURATION = 1*1000;
 var pomodoro_callback = function() {
 	countdown_timer.reset();
 	pomodoro_timer.reset();
@@ -106,7 +106,9 @@ var pomodoro_callback = function() {
 	update_count();
 	save_button.disabled = false;
 	changeBackgroundColor(BACKGROUND_GREEN);
-	alert("You made it!!, I am going to stop the forcing you to write now!\nMake sure you save youre work!");
+
+	var breaktext = count%4 ? "Take a 5 minute break." : "Treat yourself to a full 30 minutes off!";
+	alert("You made it!!, I am going to stop the forcing you to write now!\n\n" + breaktext + "\n\nMake sure you save youre work!");
 };
 var pomodoro_timer = new clsTimer(pomodoro_callback, POMODORO_DURATION);
 
