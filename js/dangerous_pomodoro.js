@@ -159,3 +159,49 @@ update_count();
 
 save_button.addEventListener('click',save_work);
 
+// Get the modal
+var modal = $('myModal');
+
+// Get the button that opens the modal
+var btn = $("myBtn");
+
+// Get the <span> element that closes the modal
+var span = $('btn-close-modal');
+
+var openModal = function() {
+	modal.style.display = "block";
+}
+
+var closeModal = function() {
+	modal.style.display = "none";
+}
+
+// When the user clicks on the button, open the modal 
+btn.onclick = openModal;
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = closeModal;
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        closeModal();
+    }
+}
+
+openModal();
+
+function changeSessionLength(val) {
+	pomodoro_timer = new clsTimer(pomodoro_callback, val);
+}
+
+var radios = document.forms["session-length"].elements["time"];
+for(var i = 0, max = radios.length; i < max; i++) {
+    radios[i].onclick = function() {
+        changeSessionLength(this.value);
+    }
+}
+
+
+
+

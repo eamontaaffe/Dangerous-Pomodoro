@@ -30,7 +30,7 @@
 		</div>
 		<div class="row">
 			<div class="col-sm-6 align-left">
-				<h7 id="text-count"></h7>
+				<h6 id="text-count"></h6>
 			</div>
 			<div class="col-sm-6 align-right">
 				<button id="btn-save" class="btn">Save</button>
@@ -38,12 +38,43 @@
 		</div>
 		<br>
 		<div>
-			<p>This is a mash up of a <a href="https://en.wikipedia.org/wiki/Pomodoro_Technique">pomodoro clock</a> and <a href="http://www.themostdangerouswritingapp.com/">the most dangerous writing app</a> by <a href="https://www.twitter.com/maebert">@maebert</a>. The idea is as soon as you start working you can't stop for a full pomodoro (25 minutes) because if you stop for more than 30 seconds, I am going to delete all your work. haha-haha-haha-haaaaa.</p>
+			<p>Created by <a href="mailto:eamon@taaffe.com.au">Eamon Taaffe</a>.</p>
+		</div>
+	</div>
+
+	<!-- Trigger the modal with a button -->
+	<button id="btn-modal" style="display:none;" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button>
+
+	<!-- The Modal -->
+	<div id="myModal" class="modal">
+
+	  <!-- Modal content -->
+	  <div class="modal-content">
+	    <span class="close">x</span>
+	    <h3>Welcome to Dangerous Pomodoro</h3>
+
+	    <div id="about">
+	    	<p>This is a mash up of a <a href="https://en.wikipedia.org/wiki/Pomodoro_Technique">pomodoro clock</a> and <a href="http://www.themostdangerouswritingapp.com/">the most dangerous writing app</a> by <a href="https://www.twitter.com/maebert">@maebert</a>. The idea is as soon as you start working you can't stop for a full pomodoro (25 minutes) because if you stop for more than 30 seconds, I am going to delete all your work. haha-haha-haha-haaaaa.</p>
 			<p>There is a save button, but it is only activated at the end of a pomodoro session. So you better keep working!</p>
 			<p>After every pomodoro, you can have a 5 minute break. At the end of every 4th pomodoro, treat yourself to a full 30 minute break because you deserve it.</p>	
 			<br>
-			<p>Created by <a href="mailto:eamon@taaffe.com.au">Eamon Taaffe</a>.</p>
-		</div>
+	    </div>
+
+	    <div id="session-length">
+	    	<label for="time">Pick your session length:</label>
+
+	    	<form name="session-length">
+	            <input class='select_time' id='r1' type='radio' name='time' value='600000' /> <label for='r1'>10:00</label><br>
+	            <input class='select_time' checked id='r4' type='radio' name='time' value='1500000' /> <label for='r4'>25:00 (recommended)</label><br>
+	            <input class='select_time' id='r5' type='radio' name='time' value='2400000' /> <label for='r5'>40:00</label>
+            </form>
+	    </div>
+
+	    <br>
+
+	    <button id="btn-close-modal" class="btn btn-primary">Let's go</button>
+	  </div>
+
 	</div>
 
 	<script>
