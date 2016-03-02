@@ -98,7 +98,7 @@ var countdown_callback = function() {
 };
 var countdown_timer = new clsTimer(countdown_callback, COUNTDOWN_DURATION);
 
-var POMODORO_DURATION = 1*1000;
+var POMODORO_DURATION = 25*60*1000;
 var pomodoro_callback = function() {
 	countdown_timer.reset();
 	pomodoro_timer.reset();
