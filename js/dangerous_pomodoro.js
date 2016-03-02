@@ -93,8 +93,10 @@ var COUNTDOWN_DURATION = 30*1000;
 var countdown_callback = function() {
 	countdown_timer.reset();
 	pomodoro_timer.reset();
+	save_button.disabled = false;
 	alert("You took too long of a break, now I am going to delete your work!");
 	editor.value = "";
+	changeBackgroundColor(BACKGROUND_GREEN);
 };
 var countdown_timer = new clsTimer(countdown_callback, COUNTDOWN_DURATION);
 
