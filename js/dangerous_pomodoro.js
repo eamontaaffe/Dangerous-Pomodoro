@@ -68,7 +68,7 @@ function formatTime(time) {
 	var newTime = '';
 
 	// Check if the time is negative
-	var isNegative = time < 0;
+	var isNegative = time < -999;
 
 	// Always format numbers as if they were positive and then
 	// we can add the sign at the end
@@ -103,12 +103,15 @@ function setSaveButtonDisabled(dis) {
 }
 
 var countdown_callback = function() {
-	countdown_timer.reset();
-	pomodoro_timer.reset();
-	setSaveButtonDisabled(false);
-	alert("You took too long of a break, now I am going to delete your work!");
-	editor.value = "";
-	changeBackgroundColor(BACKGROUND_GREEN);
+	countdown_timer.pause();
+	pomodoro_timer.pause();
+	openAngryModal(function() {
+		countdown_timer.reset();
+		pomodoro_timer.reset();
+		setSaveButtonDisabled(false);
+		editor.value = "";
+		changeBackgroundColor(BACKGROUND_GREEN);
+	});
 };
 
 var countdown_timer = new clsTimer(countdown_callback, COUNTDOWN_DURATION);
@@ -208,11 +211,22 @@ var openBreakModal = function(breakText, breakDuration) {
 	break_modal.style.display = "block";
 }
 
+/////////////// Angry Modal ////////////////
+
+var angry_modal = $('angry-modal');
+var angry_modal_btn = $('btn-angry-modal')
+
+var openAngryModal = function(cb) {
+	angry_modal.style.display = "block";
+	angry_modal_btn.addEventListener('click',cb);
+}
+
 /////////////// All Modals /////////////////
 // When the user clicks anywhere outside of the modal, close it
 var closeModals = function() {
 	intro_modal.style.display = "none";
 	break_modal.style.display = "none";
+	angry_modal.style.display = "none";
 }
 
 window.onclick = function(event) {
@@ -220,6 +234,9 @@ window.onclick = function(event) {
         closeModals();
     }
     if (event.target == break_modal) {
+        closeModals();
+    }
+    if (event.target == angry_modal) {
         closeModals();
     }
 }
