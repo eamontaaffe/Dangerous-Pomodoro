@@ -1,3 +1,12 @@
+var POMODORO_DURATION = 25*60*1000;
+var QUICK_BREAK_DURATION = 5*60*1000;
+var LONG_BREAK_DURATION = 30*60*1000;
+var COUNTDOWN_DURATION = 30*1000;
+
+var BACKGROUND_RED = "#FFEBEE";
+var BACKGROUND_GREEN = "#F1F8E9";
+
+
 /*****************************************
 **************** TIMER *******************
 *****************************************/
@@ -78,9 +87,6 @@ function formatTime(time) {
 	return newTime;
 }
 
-var BACKGROUND_RED = "#FFEBEE";
-var BACKGROUND_GREEN = "#F1F8E9";
-
 function changeBackgroundColor(color) {
    document.body.style.background = color;
 }
@@ -88,45 +94,46 @@ function changeBackgroundColor(color) {
 changeBackgroundColor(BACKGROUND_GREEN);
 
 var editor = $('editor');
+var save_buttons = document.getElementsByClassName('btn-save');
 
-var COUNTDOWN_DURATION = 30*1000;
+function setSaveButtonDisabled(dis) {
+	for (var i = 0; i < save_buttons.length; i++) {
+    	save_buttons[i].disabled = dis;
+	}
+}
+
 var countdown_callback = function() {
 	countdown_timer.reset();
 	pomodoro_timer.reset();
-	save_button.disabled = false;
+	setSaveButtonDisabled(false);
 	alert("You took too long of a break, now I am going to delete your work!");
 	editor.value = "";
 	changeBackgroundColor(BACKGROUND_GREEN);
 };
+
 var countdown_timer = new clsTimer(countdown_callback, COUNTDOWN_DURATION);
 
-var POMODORO_DURATION = 25*60*1000;
 var pomodoro_callback = function() {
 	countdown_timer.reset();
 	pomodoro_timer.reset();
 	count ++;
 	update_count();
-	save_button.disabled = false;
+	setSaveButtonDisabled(false);
 	changeBackgroundColor(BACKGROUND_GREEN);
 
 	var breaktext = count%4 ? "Take a 5 minute break." : "Treat yourself to a full 30 minutes off!";
-	alert("You made it!!, I am going to stop the forcing you to write now!\n\n" + breaktext + "\n\nMake sure you save your work!");
+	var message = "You made it!!, I am going to stop the forcing you to write now!\n\n" + breaktext + "\n\nMake sure you save your work!";
+
+	openBreakModal(message,count%4 ? QUICK_BREAK_DURATION : LONG_BREAK_DURATION);
+
 };
 var pomodoro_timer = new clsTimer(pomodoro_callback, POMODORO_DURATION);
 
 var remaining_text_area = $('text-remaining-time');
 var countdown_text_area = $('text-countdown');
 
-displayState = function() {
-	remaining_text_area.innerHTML = formatTime(pomodoro_timer.getTimeLeft());
-	countdown_text_area.innerHTML = formatTime(countdown_timer.getTimeLeft());
-}
-
-// Used to check the time every second 
-var myVar = setInterval(displayState,100);
-
 var keypress = function(){
-	save_button.disabled = true;
+	setSaveButtonDisabled(true);
 	countdown_timer.reset();
 	countdown_timer.start();
 	pomodoro_timer.start();
@@ -134,8 +141,6 @@ var keypress = function(){
 }
 
 editor.addEventListener('keypress',keypress);
-
-var save_button = $('btn-save');
 
 save_work = function() {
 	var value = editor.value;
@@ -157,36 +162,20 @@ update_count = function() {
 
 update_count();
 
-save_button.addEventListener('click',save_work);
-
-// Get the modal
-var modal = $('myModal');
-
-// Get the button that opens the modal
-var btn = $("myBtn");
-
-// Get the <span> element that closes the modal
-var span = $('btn-close-modal');
-
-var openModal = function() {
-	modal.style.display = "block";
+for (var i = 0; i < save_buttons.length; i++) {
+    save_buttons[i].addEventListener('click',save_work,false);
 }
+/*****************************************
+**************** Modals ******************
+*****************************************/
 
-var closeModal = function() {
-	modal.style.display = "none";
+///////////// Intro Modal //////////////////
+
+var intro_modal = $('intro-modal');
+
+var openIntroModal = function() {
+	intro_modal.style.display = "block";
 }
-
-// When the user clicks on <span> (x), close the modal
-span.onclick = closeModal;
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-    if (event.target == modal) {
-        closeModal();
-    }
-}
-
-openModal();
 
 function changeSessionLength(val) {
 	pomodoro_timer = new clsTimer(pomodoro_callback, val);
@@ -199,6 +188,64 @@ for(var i = 0, max = radios.length; i < max; i++) {
     }
 }
 
+///////////// Break Modal //////////////////
 
+var break_modal = $('break-modal');
+var break_modal_message = $('text-break');
+var break_modal_clock = $('text-break-clock');
+
+var break_callback = function() {
+	closeModals();
+	break_timer.pause();
+}
+
+var break_timer = null;
+
+var openBreakModal = function(breakText, breakDuration) {
+	break_timer = new clsTimer(break_callback, breakDuration);
+	break_timer.start();
+	break_modal_message.innerHTML = breakText;
+	break_modal.style.display = "block";
+}
+
+/////////////// All Modals /////////////////
+// When the user clicks anywhere outside of the modal, close it
+var closeModals = function() {
+	intro_modal.style.display = "none";
+	break_modal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == intro_modal) {
+        closeModals();
+    }
+    if (event.target == break_modal) {
+        closeModals();
+    }
+}
+
+// Get the btn elements that closes the modal
+var x = document.getElementsByClassName("btn-close-modal");
+
+for (var i = 0; i < x.length; i++) {
+    x[i].addEventListener('click',closeModals,false);
+}
+
+
+//////////////////////////////////////
+
+displayState = function() {
+	remaining_text_area.innerHTML = formatTime(pomodoro_timer.getTimeLeft());
+	countdown_text_area.innerHTML = formatTime(countdown_timer.getTimeLeft());
+
+	if(break_timer)
+		break_modal_clock.innerHTML = formatTime(break_timer.getTimeLeft());
+}
+
+
+// Used to check the time every second 
+var myVar = setInterval(displayState,100);
+
+openIntroModal();
 
 

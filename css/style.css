@@ -18,6 +18,10 @@
     width: 100%;
 }
 
+.gap-sm-top{
+    margin-top:5px;
+}
+
 textarea {
 	background-color: transparent;
 	outline: none;
