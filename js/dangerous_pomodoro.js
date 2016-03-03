@@ -218,15 +218,26 @@ var angry_modal_btn = $('btn-angry-modal')
 
 var openAngryModal = function(cb) {
 	angry_modal.style.display = "block";
-	angry_modal_btn.addEventListener('click',cb);
+	closeModalsCb = cb;
 }
 
 /////////////// All Modals /////////////////
 // When the user clicks anywhere outside of the modal, close it
+
+var closeModalsCb = null;
+
 var closeModals = function() {
 	intro_modal.style.display = "none";
 	break_modal.style.display = "none";
 	angry_modal.style.display = "none";
+
+	console.log(closeModalsCb);
+
+	if (closeModalsCb != null) {
+		closeModalsCb();
+		closeModalsCb = null;
+	}
+
 }
 
 window.onclick = function(event) {
