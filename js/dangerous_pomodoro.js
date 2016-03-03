@@ -178,6 +178,7 @@ var intro_modal = $('intro-modal');
 
 var openIntroModal = function() {
 	intro_modal.style.display = "block";
+	editor.disabled = true;
 }
 
 function changeSessionLength(val) {
@@ -209,6 +210,7 @@ var openBreakModal = function(breakText, breakDuration) {
 	break_timer.start();
 	break_modal_message.innerHTML = breakText;
 	break_modal.style.display = "block";
+	editor.disabled = true;
 }
 
 /////////////// Angry Modal ////////////////
@@ -219,6 +221,7 @@ var angry_modal_btn = $('btn-angry-modal')
 var openAngryModal = function(cb) {
 	angry_modal.style.display = "block";
 	closeModalsCb = cb;
+	editor.disabled = true;
 }
 
 /////////////// All Modals /////////////////
@@ -230,6 +233,7 @@ var closeModals = function() {
 	intro_modal.style.display = "none";
 	break_modal.style.display = "none";
 	angry_modal.style.display = "none";
+	editor.disabled = false;
 
 	console.log(closeModalsCb);
 
